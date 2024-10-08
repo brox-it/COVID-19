@@ -9,6 +9,7 @@
 import csv
 from operator import itemgetter
 from datetime import datetime
+import os
 from os.path import join as pjoin
 
 import numpy as np
@@ -42,6 +43,7 @@ from sklearn import metrics
 
 def load_embedding_vectors(data_path):
     obj2idx, emb = {}, []
+    current_directory = os.getcwd()
     with open(data_path) as fin:
         csv_reader = csv.reader(fin)
         for i, line in enumerate(csv_reader):
@@ -63,8 +65,10 @@ def pipeline_A1(drug2idx, drug_emb, disease2idx, disease_emb, out_path):
         n_components=2, n_neighbors=10, min_dist=0.25,
         metric='cosine', random_state=0).fit_transform(emb_together)
 
+    y = np.asarray(coords[len(drug2idx) + disease2idx['COVID-19']])
+    y_reshape = y.reshape(1, -1)
     distances = metrics.pairwise_distances(
-        X=coords, Y=np.matrix(coords[len(drug2idx) + disease2idx['COVID-19']]), metric='euclidean')
+        X=coords, Y=y_reshape, metric='euclidean')
     drug_dist = [(drug, distances[drug2idx[drug]][0]) for drug in drug2idx]
     drug_dist = sorted(drug_dist, reverse=False, key=itemgetter(1))
     write_prediction_list(drug_dist, out_path)
@@ -75,8 +79,10 @@ def pipeline_A2(drug2idx, drug_emb, disease2idx, disease_emb, out_path):
         n_components=2, n_neighbors=10, min_dist=0.8,
         metric='cosine', random_state=0).fit_transform(emb_together)
 
+    y = np.asarray(coords[len(drug2idx) + disease2idx['COVID-19']])
+    y_reshape = y.reshape(1, -1)
     distances = metrics.pairwise_distances(
-        X=coords, Y=np.matrix(coords[len(drug2idx) + disease2idx['COVID-19']]), metric='euclidean')
+        X=coords, Y=y_reshape, metric='euclidean')
     drug_dist = [(drug, distances[drug2idx[drug]][0]) for drug in drug2idx]
     drug_dist = sorted(drug_dist, reverse=False, key=itemgetter(1))
     write_prediction_list(drug_dist, out_path)
@@ -87,8 +93,10 @@ def pipeline_A3(drug2idx, drug_emb, disease2idx, disease_emb, out_path):
         n_components=2, n_neighbors=5, min_dist=0.5,
         metric='cosine', random_state=0).fit_transform(emb_together)
 
+    y = np.asarray(coords[len(drug2idx) + disease2idx['COVID-19']])
+    y_reshape = y.reshape(1, -1)
     distances = metrics.pairwise_distances(
-        X=coords, Y=np.matrix(coords[len(drug2idx) + disease2idx['COVID-19']]), metric='euclidean')
+        X=coords, Y=y_reshape, metric='euclidean')
     drug_dist = [(drug, distances[drug2idx[drug]][0]) for drug in drug2idx]
     drug_dist = sorted(drug_dist, reverse=False, key=itemgetter(1))
     write_prediction_list(drug_dist, out_path)
@@ -99,17 +107,22 @@ def pipeline_A4(drug2idx, drug_emb, disease2idx, disease_emb, out_path):
         n_components=2, n_neighbors=10, min_dist=1, metric='cosine',
         random_state=0).fit_transform(emb_together)
 
+    y = np.asarray(coords[len(drug2idx) + disease2idx['COVID-19']])
+    y_reshape = y.reshape(1, -1)
     distances = metrics.pairwise_distances(
-        X=coords, Y=np.matrix(coords[len(drug2idx) + disease2idx['COVID-19']]), metric='euclidean')
+        X=coords, Y=y_reshape, metric='euclidean')
     drug_dist = [(drug, distances[drug2idx[drug]][0]) for drug in drug2idx]
     drug_dist = sorted(drug_dist, reverse=False, key=itemgetter(1))
     write_prediction_list(drug_dist, out_path)
 
 
-disease2idx, disease_emb = load_embedding_vectors(pjoin('data', 'DatasetS6.csv'))
-drug2idx, drug_emb = load_embedding_vectors(pjoin('data', 'DatasetS7.csv'))
+data_path = 'submodules/baseline/data'
+output_path = 'submodules/baseline/output'
 
-pipeline_A1(drug2idx, drug_emb, disease2idx, disease_emb, pjoin('output', 'ai', '1__COVID-19.tsv'))
-pipeline_A2(drug2idx, drug_emb, disease2idx, disease_emb, pjoin('output', 'ai', '2__COVID-19.tsv'))
-pipeline_A3(drug2idx, drug_emb, disease2idx, disease_emb, pjoin('output', 'ai', '3__COVID-19.tsv'))
-pipeline_A4(drug2idx, drug_emb, disease2idx, disease_emb, pjoin('output', 'ai', '4__COVID-19.tsv'))
+disease2idx, disease_emb = load_embedding_vectors(pjoin(data_path, 'DatasetS6.csv'))
+drug2idx, drug_emb = load_embedding_vectors(pjoin(data_path, 'DatasetS7.csv'))
+
+pipeline_A1(drug2idx, drug_emb, disease2idx, disease_emb, pjoin(output_path, 'ai', '1__COVID-19.tsv'))
+pipeline_A2(drug2idx, drug_emb, disease2idx, disease_emb, pjoin(output_path, 'ai', '2__COVID-19.tsv'))
+pipeline_A3(drug2idx, drug_emb, disease2idx, disease_emb, pjoin(output_path, 'ai', '3__COVID-19.tsv'))
+pipeline_A4(drug2idx, drug_emb, disease2idx, disease_emb, pjoin(output_path, 'ai', '4__COVID-19.tsv'))
