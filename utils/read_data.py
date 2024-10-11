@@ -19,14 +19,14 @@ def connected_component_subgraphs(G, copy=True):
             yield G.subgraph(c)
             
             
-def PPI():
+def PPI(data_path):
 
     import networkx as nx
 
-    path_cur = os.getcwd()
+    path_cur = os.getcwd() + '/'
     #path_par = os.path.abspath(os.path.join(path_cur, os.pardir))
     path_par = path_cur
-    file = open(path_par+'/data/DatasetS2.csv', 'r')
+    file = open(path_par + data_path + '/DatasetS2.csv', 'r')
     rows = file.read().splitlines()[1::]
     file.close()
     G_o = nx.Graph()
@@ -45,22 +45,22 @@ def PPI():
     return G
 
 
-def seed_gordon():
+def seed_gordon(data_path):
 
     import pandas as pd
     path_cur = os.getcwd()
     path_par = path_cur #os.path.abspath(os.path.join(path_cur, os.pardir))
-    genes = list(pd.read_csv(path_par+'/data/DatasetS1.csv')['Symbol'].str.strip().values)
+    genes = list(pd.read_csv(path_par+ data_path + '/DatasetS1.csv')['Symbol'].str.strip().values)
 
     return set(convert2entrez(genes))
 
 
-def entrez_sym_map():
+def entrez_sym_map(data_path):
 
     path_cur = os.getcwd()
     #path_par = os.path.abspath(os.path.join(path_cur, os.pardir))
     path_par = path_cur
-    file = open(path_par+'/data/interactome_2019_merged_protAnnots.csv', 'r')
+    file = open(path_par + data_path + '/interactome_2019_merged_protAnnots.csv', 'r')
     rows = file.read().splitlines()[1::]
     file.close()
 
@@ -91,13 +91,13 @@ def convert2entrez(symbols):
     return set(seed_list)
 
 
-def drugbank():
+def drugbank(data_path):
 
     import pandas as pd
     path_cur = os.getcwd()
     #path_par = os.path.abspath(os.path.join(path_cur, os.pardir))
     path_par =  path_cur
-    df = pd.read_csv(path_par + '/data/DatasetS3.csv')
+    df = pd.read_csv(path_par + data_path + '/DatasetS3.csv')
     data= zip(df['ID'].values, df['entrez_id'].values)
     data_names = zip(df['ID'].values, df['Name'].values)
     drug2target={}
@@ -118,13 +118,13 @@ def drugbank():
     return results
 
 
-def clinical_trials():
+def clinical_trials(data_path):
 
     import pandas as pd
     path_cur = os.getcwd()
     #path_par = os.path.abspath(os.path.join(path_cur, os.pardir))
     path_par =  path_cur
-    df = pd.read_excel(path_par+'/data/DatasetS10.xlsx',sheet_name = "DB")
+    df = pd.read_excel(path_par+data_path+'/DatasetS10.xlsx',sheet_name = "DB")
     drugs = set(df['ID'].values)
     db_results = drugbank()
     drug2targets = db_results['drug2target']

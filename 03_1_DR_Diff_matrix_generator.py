@@ -59,8 +59,12 @@ def rw_dsd_generator(adjacency_in, nrw):
 
 if __name__ == "__main__":
 
+
+    data_path = 'submodules/baseline/data'
+    output_path = 'submodules/baseline/output'
+
     from utils.read_data import PPI
-    G = PPI()
+    G = PPI(data_path)
     # --------------------------------------------
     G_nodes = G.nodes()
     node_2_id = {}
@@ -68,19 +72,19 @@ if __name__ == "__main__":
     for ind, node in enumerate(G_nodes):
         node_2_id[node] = ind
         id2node[ind] = node
-    pickle.dump(id2node, open('output/diffusion/ppi_id_2_node.p', 'wb'))
-    pickle.dump(node_2_id, open('output/diffusion/ppi_node_2_id.p', 'wb'))
+    pickle.dump(id2node, open(output_path + '/diffusion/ppi_id_2_node.p', 'wb'))
+    pickle.dump(node_2_id, open(output_path + '/diffusion/ppi_node_2_id.p', 'wb'))
     # --------------------------------------------
     adjacency_ppi = np.array(nx.adjacency_matrix(G).todense())
     results_rw_dsd = rw_dsd_generator(adjacency_ppi, 100)
     rw_matrix = np.array(results_rw_dsd['RW'])
     dsd_matrix = np.array(results_rw_dsd['DSD'])
 
-    pickle.dump(dsd_matrix, open('output/diffusion/PPI_DSD_100.p', 'wb'))
+    pickle.dump(dsd_matrix, open(output_path + '/diffusion/PPI_DSD_100.p', 'wb'))
     # ------------------- KL & JS ------------
     results_kl_js = kl_divergence_matrix(rw_matrix)
     kl_matrix = np.array(results_kl_js['RWKL'])
     js_matrix = np.array(results_kl_js['RWJS'])
 
-    pickle.dump(kl_matrix, open('output/diffusion/PPI_KL_100.p', 'wb'))
-    pickle.dump(js_matrix, open('output/diffusion/PPI_JS_100.p', 'wb'))
+    pickle.dump(kl_matrix, open(output_path + '/diffusion/PPI_KL_100.p', 'wb'))
+    pickle.dump(js_matrix, open(output_path + '/diffusion/PPI_JS_100.p', 'wb'))
